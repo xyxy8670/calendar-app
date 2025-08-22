@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { CalendarState, Event, EventType } from '../types';
-import { DEFAULT_EVENT_TYPES } from '../types';
+import type { CalendarState, Event, EventType, TextSettings, CalendarSize } from '../types';
+import { DEFAULT_EVENT_TYPES, DEFAULT_TEXT_SETTINGS, DEFAULT_CALENDAR_SIZE } from '../types';
 
 interface CalendarContextType {
   state: CalendarState;
@@ -15,6 +15,8 @@ interface CalendarContextType {
   updateEventType: (id: string, eventType: Partial<EventType>) => void;
   deleteEventType: (id: string) => void;
   setCommonEvents: (commonEvents: string) => void;
+  updateTextSettings: (textSettings: Partial<TextSettings>) => void;
+  updateCalendarSize: (calendarSize: CalendarSize) => void;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
@@ -39,6 +41,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     events: [],
     eventTypes: DEFAULT_EVENT_TYPES,
     commonEvents: '',
+    textSettings: DEFAULT_TEXT_SETTINGS,
+    calendarSize: DEFAULT_CALENDAR_SIZE,
   });
 
   const setYear = (year: number) => {
@@ -111,6 +115,17 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     setState(prev => ({ ...prev, commonEvents }));
   };
 
+  const updateTextSettings = (textSettingsUpdate: Partial<TextSettings>) => {
+    setState(prev => ({
+      ...prev,
+      textSettings: { ...prev.textSettings, ...textSettingsUpdate },
+    }));
+  };
+
+  const updateCalendarSize = (calendarSize: CalendarSize) => {
+    setState(prev => ({ ...prev, calendarSize }));
+  };
+
   const value: CalendarContextType = {
     state,
     setYear,
@@ -123,6 +138,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     updateEventType,
     deleteEventType,
     setCommonEvents,
+    updateTextSettings,
+    updateCalendarSize,
   };
 
   return (

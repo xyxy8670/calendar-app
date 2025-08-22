@@ -6,111 +6,112 @@ import { formatDateForDisplay } from '../utils/dateUtils';
 const ImageDownload: React.FC = () => {
   const { state } = useCalendar();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [downloadType, setDownloadType] = useState<'calendar' | 'full'>('full');
 
-  const generateImage = async () => {
+  const generateCalendarImage = async () => {
     setIsGenerating(true);
     
     try {
-      let element: HTMLElement | null = null;
+      // 캘린더 컨테이너만 정확히 타겟팅 (월간메모 포함)
+      const calendarElement = document.getElementById('calendar-container');
       
-      if (downloadType === 'calendar') {
-        element = document.getElementById('calendar-container');
-      } else {
-        element = document.getElementById('app-container');
+      if (!calendarElement) {
+        throw new Error('캘린더를 찾을 수 없습니다.');
       }
 
-      if (!element) {
-        throw new Error('캘린더 요소를 찾을 수 없습니다.');
-      }
+      // 잠시 대기하여 렌더링 완료 보장
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const canvas = await html2canvas(element, {
+      const canvas = await html2canvas(calendarElement, {
         backgroundColor: '#ffffff',
-        scale: 2, // Higher resolution
-        logging: false,
+        scale: 2, // 고해상도
+        logging: true,
         useCORS: true,
         allowTaint: true,
+        foreignObjectRendering: false,
+        onclone: (clonedDoc) => {
+          // 클론된 문서에서 폰트 로드 확인
+          const clonedElement = clonedDoc.getElementById('calendar-container');
+          if (clonedElement) {
+            clonedElement.style.fontFamily = "'OnglipBakdahyeonche', sans-serif";
+            clonedElement.style.width = '100%';
+            clonedElement.style.maxWidth = 'none';
+          }
+        }
       });
 
-      // Create download link
+      // 직접 다운로드
       const link = document.createElement('a');
       link.download = `calendar-${state.year}-${state.month.toString().padStart(2, '0')}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = canvas.toDataURL('image/png', 1.0);
       
-      // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
     } catch (error) {
       console.error('Image generation failed:', error);
-      alert('이미지 생성 중 오류가 발생했습니다.');
+      alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900">이미지 다운로드</h3>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center space-x-3 mb-6">
+        <h3 className="text-xl font-semibold text-slate-800">이미지 다운로드</h3>
+      </div>
       
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            다운로드 옵션
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="downloadType"
-                value="full"
-                checked={downloadType === 'full'}
-                onChange={(e) => setDownloadType(e.target.value as 'calendar' | 'full')}
-                className="mr-2"
-              />
-              <span className="text-sm text-gray-700">전체 화면 (공통 일정 포함)</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="downloadType"
-                value="calendar"
-                checked={downloadType === 'calendar'}
-                onChange={(e) => setDownloadType(e.target.value as 'calendar' | 'full')}
-                className="mr-2"
-              />
-              <span className="text-sm text-gray-700">캘린더만</span>
-            </label>
+      {/* Information */}
+      <div style={{
+        backgroundColor: 'transparent',
+        borderRadius: '12px',
+        padding: '20px',
+        border: '1px solid #d1d5db',
+        boxSizing: 'border-box',
+        marginBottom: '20px'
+      }}>
+        <div className="flex items-start space-x-3">
+          <div>
+            <h4 className="text-lg font-semibold text-slate-800 mb-2">다운로드 안내</h4>
+            <p className="text-base text-slate-700">
+              캘린더와 월간메모가 고품질로 저장됩니다<br />
+              (넓은 가로형 비율, 3배 해상도)
+            </p>
           </div>
         </div>
+      </div>
 
+      {/* Download Button */}
+      <div style={{
+        backgroundColor: 'transparent',
+        borderRadius: '12px',
+        padding: '20px',
+        border: '1px solid #d1d5db',
+        boxSizing: 'border-box'
+      }}>
         <button
-          onClick={generateImage}
+          onClick={generateCalendarImage}
           disabled={isGenerating}
-          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-slate-800 text-white rounded-xl hover:bg-slate-700 focus:outline-none focus:ring-3 focus:ring-slate-300 transition-all duration-200 font-semibold text-lg shadow-sm hover:shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none"
         >
           {isGenerating ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              이미지 생성 중...
+              <span>이미지 생성 중...</span>
             </>
           ) : (
             <>
-              📸 {formatDateForDisplay(state.year, state.month)} 캘린더 다운로드
+              <span>{formatDateForDisplay(state.year, state.month)} 달력 다운로드</span>
             </>
           )}
         </button>
       </div>
 
-      <div className="text-sm text-gray-600 space-y-1">
-        <p>• 고해상도 PNG 파일로 다운로드됩니다</p>
-        <p>• 파일명: calendar-YYYY-MM.png</p>
-        <p>• 다운로드 시간은 일정 수에 따라 달라질 수 있습니다</p>
-      </div>
     </div>
   );
 };

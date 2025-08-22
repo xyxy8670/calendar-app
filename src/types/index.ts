@@ -11,12 +11,26 @@ export interface EventType {
   color: string;
 }
 
+export interface TextSettings {
+  eventFontSize: string; // CSS 크기 값 (예: '14px', '1rem')
+  eventTextColor: string; // CSS 색상 값 (예: '#000000')
+  memoFontSize: string;
+  memoTextColor: string;
+}
+
+export interface CalendarSize {
+  width: number; // 가로 크기 (%)
+  height: number; // 세로 크기 (%)
+}
+
 export interface CalendarState {
   year: number;
   month: number;
   events: Event[];
   eventTypes: EventType[];
   commonEvents: string;
+  textSettings: TextSettings;
+  calendarSize: CalendarSize;
 }
 
 export interface CalendarDay {
@@ -45,3 +59,15 @@ export const DEFAULT_EVENT_TYPES: EventType[] = [
   { id: '3', name: '상장', color: '#f59e0b' }, // yellow
   { id: '4', name: '청약', color: '#ef4444' }, // red
 ];
+
+export const DEFAULT_TEXT_SETTINGS: TextSettings = {
+  eventFontSize: '0.875rem',
+  eventTextColor: '#1e293b', 
+  memoFontSize: '1rem',
+  memoTextColor: '#374151'
+};
+
+export const DEFAULT_CALENDAR_SIZE: CalendarSize = {
+  width: 70,
+  height: 100
+};

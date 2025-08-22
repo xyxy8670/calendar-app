@@ -1,10 +1,11 @@
 import React from 'react';
 import { useCalendar } from '../contexts/CalendarContext';
-import { getDaysInMonth, formatDateForDisplay, getWeekdays, getEventsForDate } from '../utils/dateUtils';
+import { getDaysInMonth, getWeekdays, getEventsForDate } from '../utils/dateUtils';
+import DateSelector from './DateSelector';
 
 const Calendar: React.FC = () => {
   const { state } = useCalendar();
-  const { year, month, events } = state;
+  const { year, month, events, commonEvents, textSettings, calendarSize } = state;
 
   const days = getDaysInMonth(year, month);
   const weekdays = getWeekdays();
@@ -16,42 +17,53 @@ const Calendar: React.FC = () => {
            today.getDate() === day;
   };
 
-  const renderDay = (day: number, isCurrentMonth: boolean, index: number) => {
+  const renderDay = (calendarDay: { date: number; isCurrentMonth: boolean }, index: number) => {
+    const { date: day, isCurrentMonth } = calendarDay;
     const dayEvents = isCurrentMonth ? getEventsForDate(events, year, month, day) : [];
     const todayFlag = isToday(day, isCurrentMonth);
     
     return (
       <div
-        key={index}
-        className={`relative h-32 border-r border-b border-gray-200 p-3 hover:bg-gray-50 ${
-          isCurrentMonth ? 'bg-white' : 'bg-gray-50'
+        key={`${year}-${month}-${day}-${index}`}
+        data-cell
+        data-date-value={day}
+        className={`relative min-h-[6.25rem] h-auto border-b border-slate-200 p-3 hover:bg-slate-50 transition-colors duration-200 flex flex-col ${
+          isCurrentMonth ? 'bg-white' : 'bg-slate-50'
         }`}
+        style={{ aspectRatio: '1.2 / 1' }}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className={`text-sm ${
-            todayFlag 
-              ? 'bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium' 
-              : isCurrentMonth 
-                ? 'text-gray-900 font-medium' 
-                : 'text-gray-400'
-          }`}>
+        <div className="flex items-center justify-between mb-2 flex-shrink-0">
+          <span 
+            data-date
+            data-today={todayFlag ? 'true' : undefined}
+            className={`text-2xl leading-none ${
+              todayFlag 
+                ? 'bg-slate-800 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md'" 
+                : isCurrentMonth 
+                  ? 'text-slate-800 font-bold' 
+                  : 'text-slate-400'
+            }`}
+          >
             {day}
           </span>
           {dayEvents.length > 3 && (
-            <span className="text-xs text-gray-500">
-              +{dayEvents.length - 3}
+            <span className="text-sm text-slate-500 font-medium mt-auto">
+              +{dayEvents.length - 3} more
             </span>
           )}
         </div>
         
-        <div className="space-y-1">
+        <div className="space-y-1 flex-1 overflow-hidden">
           {dayEvents.slice(0, 3).map((event) => (
             <div
               key={event.id}
-              className="text-xs px-2 py-1 rounded font-medium"
+              data-event
+              className="px-2 py-1 rounded-lg font-medium border leading-tight"
               style={{ 
-                backgroundColor: event.type.color + '20', 
-                color: event.type.color
+                backgroundColor: event.type.color + '15', 
+                borderColor: event.type.color + '40',
+                fontSize: textSettings.eventFontSize,
+                color: textSettings.eventTextColor
               }}
               title={event.title}
             >
@@ -64,22 +76,27 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <div id="calendar-container" className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Calendar Header */}
-      <div className="bg-blue-600 text-white py-6 px-6">
-        <h1 className="text-2xl font-semibold text-center">
-          {formatDateForDisplay(year, month)}
-        </h1>
+    <div id="calendar-container" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" style={{
+      fontFamily: "'OnglipBakdahyeonche', sans-serif",
+      width: `${calendarSize.width}%`,
+      maxWidth: '50rem',
+      margin: '2rem auto 3rem auto',
+      transform: `scaleY(${calendarSize.height / 100})`
+    }}>
+      {/* Calendar Header with DateSelector */}
+      <div className="bg-slate-800 text-white py-4 md:py-8 px-4 md:px-8 relative">
+        <div className="flex justify-center">
+          <DateSelector />
+        </div>
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
-        {weekdays.map((weekday, index) => (
+      <div className="grid grid-cols-7 bg-slate-50">
+        {weekdays.map((weekday) => (
           <div 
             key={weekday} 
-            className={`py-3 text-center text-sm font-medium ${
-              index === 0 ? 'text-red-600' : index === 6 ? 'text-blue-600' : 'text-gray-700'
-            }`}
+            data-weekday
+            className="py-3 px-2 text-center text-xl font-bold text-slate-600 border-b border-slate-200 min-h-[3.75rem] flex items-center justify-center"
           >
             {weekday}
           </div>
@@ -87,10 +104,32 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7">
-        {days.map((day, index) => 
-          renderDay(day.date, day.isCurrentMonth, index)
+      <div className="calendar-grid grid grid-cols-7 gap-0">
+        {days.map((calendarDay, index) => 
+          renderDay(calendarDay, index)
         )}
+      </div>
+
+      {/* Monthly Memo Section */}
+      <div id="monthly-memo" className="border-t border-slate-200 bg-slate-50 p-4 md:p-6">
+        <h3 className="text-xl font-bold text-slate-800 mb-4">월간 메모</h3>
+        <div className="bg-white rounded-xl p-4 min-h-[5rem]">
+          {commonEvents ? (
+            <div 
+              className="whitespace-pre-wrap leading-relaxed"
+              style={{ 
+                fontSize: textSettings.memoFontSize,
+                color: textSettings.memoTextColor
+              }}
+            >
+              {commonEvents}
+            </div>
+          ) : (
+            <div className="text-slate-400 italic text-center py-4 text-base">
+              월간 메모가 없습니다.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

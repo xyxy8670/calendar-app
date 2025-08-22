@@ -115,19 +115,26 @@ const ExcelUpload: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex space-x-4">
+    <div className="space-y-6">
+      <div className="space-y-4">
         <button
           onClick={handleUploadClick}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-slate-800 text-white rounded-xl hover:bg-slate-700 focus:outline-none focus:ring-3 focus:ring-slate-300 transition-all duration-200 font-semibold text-base shadow-sm hover:shadow-md"
         >
-          📁 Excel 파일 업로드
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+          </svg>
+          <span>Excel 파일 업로드</span>
         </button>
+        
         <button
           onClick={downloadTemplate}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 focus:outline-none focus:ring-3 focus:ring-slate-300 transition-all duration-200 font-medium text-base"
         >
-          📥 템플릿 다운로드
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>템플릿 다운로드</span>
         </button>
       </div>
       
@@ -139,11 +146,6 @@ const ExcelUpload: React.FC = () => {
         className="hidden"
       />
       
-      <div className="text-sm text-gray-600">
-        <p>• Excel 파일의 컬럼명: date(날짜), title(일정), type(유형)</p>
-        <p>• 날짜 형식: YYYY-MM-DD 또는 YYYY/MM/DD</p>
-        <p>• 지원하는 유형: 일정, 실적, 상장, 청약</p>
-      </div>
     </div>
   );
 };
