@@ -17,6 +17,7 @@ const ImageDownload: React.FC = () => {
     let originalWidth = '';
     let originalMaxWidth = '';
     let originalMargin = '';
+    let originalFontSize = '';
     let calendarElement: HTMLElement | null = null;
     
     try {
@@ -37,14 +38,16 @@ const ImageDownload: React.FC = () => {
       originalWidth = calendarElement.style.width;
       originalMaxWidth = calendarElement.style.maxWidth;
       originalMargin = calendarElement.style.margin;
+      originalFontSize = calendarElement.style.fontSize;
       
-      // 캘린더를 전체 크기로 임시 확장
-      calendarElement.style.width = 'auto';
-      calendarElement.style.maxWidth = 'none';
+      // 캘린더를 더 작은 크기로 조정
+      calendarElement.style.width = '800px'; // 고정 너비로 작게 설정
+      calendarElement.style.maxWidth = '800px';
       calendarElement.style.height = 'auto';
       calendarElement.style.margin = '0';
       calendarElement.style.position = 'relative';
       calendarElement.style.transform = 'none';
+      calendarElement.style.fontSize = '14px'; // 폰트 크기도 작게
       
       // 잠시 대기하여 렌더링 완료 보장
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -61,9 +64,9 @@ const ImageDownload: React.FC = () => {
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
-        // 고정된 큰 윈도우 크기 사용
-        windowWidth: Math.max(1400, calendarElement.scrollWidth),
-        windowHeight: Math.max(1200, calendarElement.scrollHeight),
+        // 작은 캘린더에 맞춘 윈도우 크기
+        windowWidth: 800,
+        windowHeight: 600,
         width: calendarElement.scrollWidth,
         height: calendarElement.scrollHeight,
         onclone: (clonedDoc) => {
@@ -123,6 +126,7 @@ const ImageDownload: React.FC = () => {
         calendarElement.style.width = originalWidth;
         calendarElement.style.maxWidth = originalMaxWidth;
         calendarElement.style.margin = originalMargin;
+        calendarElement.style.fontSize = originalFontSize;
         calendarElement.style.position = '';
         calendarElement.style.transform = '';
       }
