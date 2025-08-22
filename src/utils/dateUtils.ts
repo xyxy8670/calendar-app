@@ -11,6 +11,14 @@ export const getDaysInMonth = (year: number, month: number): CalendarDay[] => {
 
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
+  // 항상 42일(6주)을 보장
+  while (days.length < 42) {
+    const lastDay = days[days.length - 1];
+    const nextDay = new Date(lastDay);
+    nextDay.setDate(lastDay.getDate() + 1);
+    days.push(nextDay);
+  }
+
   return days.map(day => ({
     date: day.getDate(),
     isCurrentMonth: isSameMonth(day, startDate),

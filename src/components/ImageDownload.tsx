@@ -23,18 +23,47 @@ const ImageDownload: React.FC = () => {
 
       const canvas = await html2canvas(calendarElement, {
         backgroundColor: '#ffffff',
-        scale: 2, // 고해상도
-        logging: true,
+        scale: 3, // 더 고해상도로 증가
+        logging: false,
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
+        width: calendarElement.scrollWidth,
+        height: calendarElement.scrollHeight,
         onclone: (clonedDoc) => {
-          // 클론된 문서에서 폰트 로드 확인
+          // 클론된 문서에서 모든 텍스트 크기 유지
           const clonedElement = clonedDoc.getElementById('calendar-container');
           if (clonedElement) {
+            // 원본 스타일 유지하면서 폰트만 보장
             clonedElement.style.fontFamily = "'OnglipBakdahyeonche', sans-serif";
-            clonedElement.style.width = '100%';
-            clonedElement.style.maxWidth = 'none';
+            
+            // 모든 텍스트 요소의 크기 강제 설정
+            const textElements = clonedElement.querySelectorAll('*');
+            textElements.forEach((el: any) => {
+              const originalEl = calendarElement.querySelector(`[data-clone-id="${el.dataset.cloneId}"]`) || el;
+              const computedStyle = window.getComputedStyle(originalEl);
+              
+              // 텍스트 크기 및 스타일 강제 적용
+              if (computedStyle.fontSize) {
+                el.style.fontSize = computedStyle.fontSize;
+                el.style.setProperty('font-size', computedStyle.fontSize, 'important');
+              }
+              if (computedStyle.lineHeight) {
+                el.style.lineHeight = computedStyle.lineHeight;
+              }
+              if (computedStyle.fontWeight) {
+                el.style.fontWeight = computedStyle.fontWeight;
+              }
+              if (computedStyle.color) {
+                el.style.color = computedStyle.color;
+              }
+              
+              // 박스 크기도 유지
+              if (computedStyle.width && el.tagName === 'SELECT') {
+                el.style.width = computedStyle.width;
+                el.style.minWidth = computedStyle.minWidth;
+              }
+            });
           }
         }
       });
