@@ -23,13 +23,15 @@ const ImageDownload: React.FC = () => {
 
       const canvas = await html2canvas(calendarElement, {
         backgroundColor: '#ffffff',
-        scale: 3, // 더 고해상도로 증가
+        scale: 2, // 안정적인 해상도로 조정
         logging: false,
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
-        width: calendarElement.scrollWidth,
-        height: calendarElement.scrollHeight,
+        width: calendarElement.scrollWidth + 40, // 좌우 여백 추가
+        height: calendarElement.scrollHeight + 40, // 상하 여백 추가
+        x: -20, // 시작점을 왼쪽으로 이동
+        y: -20, // 시작점을 위로 이동
         onclone: (clonedDoc) => {
           // 클론된 문서에서 모든 텍스트 크기 유지
           const clonedElement = clonedDoc.getElementById('calendar-container');
