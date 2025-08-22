@@ -1,7 +1,6 @@
 import { CalendarProvider } from './contexts/CalendarContext';
 import Calendar from './components/Calendar';
 import SideDrawer from './components/SideDrawer';
-import CalendarControls from './components/CalendarControls';
 
 function App() {
   return (
@@ -22,7 +21,6 @@ function App() {
           <div className="relative">
             <Calendar />
             <SideDrawer />
-            <CalendarControls />
           </div>
         </div>
       </div>

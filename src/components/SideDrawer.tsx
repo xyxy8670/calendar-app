@@ -5,7 +5,6 @@ import EventTypeManager from './EventTypeManager';
 import ImageDownload from './ImageDownload';
 import CommonEvents from './CommonEvents';
 import TextSettings from './TextSettings';
-import CalendarSizeControl from './CalendarSizeControl';
 
 interface SideDrawerProps {
   className?: string;
@@ -13,7 +12,7 @@ interface SideDrawerProps {
 
 const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'input' | 'types' | 'memo' | 'size' | 'text' | 'download'>('input');
+  const [activeTab, setActiveTab] = useState<'input' | 'types' | 'memo' | 'text' | 'download'>('input');
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -24,7 +23,6 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
     { id: 'input', label: '일정 추가' },
     { id: 'types', label: '일정 유형' },
     { id: 'memo', label: '월간 메모' },
-    { id: 'size', label: '크기 조정' },
     { id: 'text', label: '텍스트 설정' },
     { id: 'download', label: '내보내기' },
   ];
@@ -118,7 +116,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
           padding: '16px',
           borderBottom: '1px solid #e2e8f0'
         }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -230,10 +228,6 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
             }}>
               <CommonEvents />
             </div>
-          )}
-
-          {activeTab === 'size' && (
-            <CalendarSizeControl />
           )}
 
           {activeTab === 'text' && (

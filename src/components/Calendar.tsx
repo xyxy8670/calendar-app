@@ -5,7 +5,7 @@ import DateSelector from './DateSelector';
 
 const Calendar: React.FC = () => {
   const { state } = useCalendar();
-  const { year, month, events, commonEvents, textSettings, calendarSize } = state;
+  const { year, month, events, commonEvents, textSettings } = state;
 
   const days = getDaysInMonth(year, month);
   const weekdays = getWeekdays();
@@ -78,10 +78,9 @@ const Calendar: React.FC = () => {
   return (
     <div id="calendar-container" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" style={{
       fontFamily: "'OnglipBakdahyeonche', sans-serif",
-      width: `${calendarSize.width}%`,
-      maxWidth: '50rem',
-      margin: '2rem auto 3rem auto',
-      transform: `scaleY(${calendarSize.height / 100})`
+      width: '90%',
+      maxWidth: '80rem',
+      margin: '2rem auto 3rem auto'
     }}>
       {/* Calendar Header with DateSelector */}
       <div className="bg-slate-800 text-white py-4 md:py-8 px-4 md:px-8 relative">
