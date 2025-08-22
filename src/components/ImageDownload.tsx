@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import { useCalendar } from '../contexts/CalendarContext';
 import { formatDateForDisplay } from '../utils/dateUtils';
 
@@ -57,60 +57,24 @@ const ImageDownload: React.FC = () => {
       console.log('Calendar dimensions:', rect.width, rect.height);
       console.log('Scroll dimensions:', calendarElement.scrollWidth, calendarElement.scrollHeight);
 
-      const canvas = await html2canvas(calendarElement, {
+      // html-to-image를 사용하여 PNG 생성
+      const dataUrl = await htmlToImage.toPng(calendarElement, {
+        quality: 1.0,
         backgroundColor: '#ffffff',
-        scale: 1, // 스케일을 1로 줄여서 안정성 확보
-        logging: true,
-        useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: false,
-        // 작은 캘린더에 맞춘 윈도우 크기
-        windowWidth: 800,
-        windowHeight: 600,
-        width: calendarElement.scrollWidth,
-        height: calendarElement.scrollHeight,
-        onclone: (clonedDoc) => {
-          // 클론된 문서에서 모든 텍스트 크기 유지
-          const clonedElement = clonedDoc.getElementById('calendar-container');
-          if (clonedElement) {
-            // 원본 스타일 유지하면서 폰트만 보장
-            clonedElement.style.fontFamily = "'OnglipBakdahyeonche', sans-serif";
-            
-            // 모든 텍스트 요소의 크기 강제 설정
-            const textElements = clonedElement.querySelectorAll('*');
-            textElements.forEach((el: any) => {
-              const originalEl = calendarElement?.querySelector(`[data-clone-id="${el.dataset.cloneId}"]`) || el;
-              const computedStyle = window.getComputedStyle(originalEl);
-              
-              // 텍스트 크기 및 스타일 강제 적용
-              if (computedStyle.fontSize) {
-                el.style.fontSize = computedStyle.fontSize;
-                el.style.setProperty('font-size', computedStyle.fontSize, 'important');
-              }
-              if (computedStyle.lineHeight) {
-                el.style.lineHeight = computedStyle.lineHeight;
-              }
-              if (computedStyle.fontWeight) {
-                el.style.fontWeight = computedStyle.fontWeight;
-              }
-              if (computedStyle.color) {
-                el.style.color = computedStyle.color;
-              }
-              
-              // 박스 크기도 유지
-              if (computedStyle.width && el.tagName === 'SELECT') {
-                el.style.width = computedStyle.width;
-                el.style.minWidth = computedStyle.minWidth;
-              }
-            });
-          }
+        pixelRatio: 2, // 고해상도
+        style: {
+          fontFamily: "'OnglipBakdahyeonche', sans-serif"
+        },
+        filter: () => {
+          // 모든 노드를 포함
+          return true;
         }
       });
 
       // 직접 다운로드
       const link = document.createElement('a');
       link.download = `calendar-${state.year}-${state.month.toString().padStart(2, '0')}.png`;
-      link.href = canvas.toDataURL('image/png', 1.0);
+      link.href = dataUrl;
       
       document.body.appendChild(link);
       link.click();

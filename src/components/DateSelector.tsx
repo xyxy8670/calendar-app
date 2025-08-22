@@ -57,7 +57,7 @@ const DateSelector: React.FC = () => {
             id="year"
             value={year}
             onChange={(e) => setYear(parseInt(e.target.value))}
-            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[6.25rem] text-center"
+            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-3xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[6.25rem] text-center"
           >
             {years.map((y) => (
               <option key={y} value={y} className="bg-white text-slate-800">
@@ -75,7 +75,7 @@ const DateSelector: React.FC = () => {
             id="month"
             value={month}
             onChange={(e) => setMonth(parseInt(e.target.value))}
-            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[10rem] text-center"
+            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-3xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[10rem] text-center"
           >
             {months.map((m) => (
               <option key={m.value} value={m.value} className="bg-white text-slate-800">
