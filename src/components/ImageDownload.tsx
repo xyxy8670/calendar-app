@@ -30,7 +30,7 @@ const ImageDownload: React.FC = () => {
       originalScrollY = window.scrollY;
       window.scrollTo(0, 0);
       
-      // 원본 캘린더의 스타일 저장
+      // 원본 캘린더의 모든 스타일 저장
       originalStyles = {
         width: calendarElement.style.width,
         maxWidth: calendarElement.style.maxWidth,
@@ -39,18 +39,20 @@ const ImageDownload: React.FC = () => {
         position: calendarElement.style.position,
         transform: calendarElement.style.transform,
         fontSize: calendarElement.style.fontSize,
-        backgroundColor: calendarElement.style.backgroundColor
+        backgroundColor: calendarElement.style.backgroundColor,
+        overflow: calendarElement.style.overflow
       };
       
-      // 캘린더에 직접 이미지 캡처용 스타일 적용
-      calendarElement.style.width = '800px';
-      calendarElement.style.maxWidth = '800px';
-      calendarElement.style.margin = '48px'; // 패딩 역할
-      calendarElement.style.padding = '0';
-      calendarElement.style.position = 'relative';
-      calendarElement.style.transform = 'none';
-      calendarElement.style.fontSize = '14px';
-      calendarElement.style.backgroundColor = '#ffffff';
+      // 캘린더에 직접 이미지 캡처용 스타일 적용 (!important로 강제 적용)
+      calendarElement.style.setProperty('width', '800px', 'important');
+      calendarElement.style.setProperty('max-width', '800px', 'important');
+      calendarElement.style.setProperty('margin', '48px', 'important');
+      calendarElement.style.setProperty('padding', '0', 'important');
+      calendarElement.style.setProperty('position', 'relative', 'important');
+      calendarElement.style.setProperty('transform', 'none', 'important');
+      calendarElement.style.setProperty('font-size', '14px', 'important');
+      calendarElement.style.setProperty('background-color', '#ffffff', 'important');
+      calendarElement.style.setProperty('overflow', 'visible', 'important');
       
       // 렌더링 완료 대기
       await new Promise(resolve => {
@@ -91,10 +93,24 @@ const ImageDownload: React.FC = () => {
       console.error('Image generation failed:', error);
       alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
-      // 원본 캘린더 스타일 복원
+      // 원본 캘린더 스타일 복원 (!important 제거 후 원래 값 설정)
       if (calendarElement) {
+        // !important 스타일들 제거
+        calendarElement.style.removeProperty('width');
+        calendarElement.style.removeProperty('max-width');
+        calendarElement.style.removeProperty('margin');
+        calendarElement.style.removeProperty('padding');
+        calendarElement.style.removeProperty('position');
+        calendarElement.style.removeProperty('transform');
+        calendarElement.style.removeProperty('font-size');
+        calendarElement.style.removeProperty('background-color');
+        calendarElement.style.removeProperty('overflow');
+        
+        // 원래 스타일 복원
         Object.keys(originalStyles).forEach(key => {
-          calendarElement!.style[key as any] = originalStyles[key];
+          if (originalStyles[key]) {
+            calendarElement!.style[key as any] = originalStyles[key];
+          }
         });
       }
       // 스크롤 위치 복원
