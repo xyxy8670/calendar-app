@@ -36,11 +36,13 @@ const ImageDownload: React.FC = () => {
       exportWrapper.style.padding = '48px';
       exportWrapper.style.backgroundColor = '#ffffff';
       exportWrapper.style.boxSizing = 'border-box';
-      exportWrapper.style.width = 'auto';
+      exportWrapper.style.width = '1000px'; // 고정 너비 지정
       exportWrapper.style.height = 'auto';
       exportWrapper.style.position = 'absolute';
       exportWrapper.style.top = '-9999px'; // 화면 밖에 위치
       exportWrapper.style.left = '-9999px';
+      exportWrapper.style.display = 'block'; // 명시적으로 block 지정
+      exportWrapper.style.visibility = 'hidden'; // 보이지 않지만 렌더링은 됨
       
       // 캘린더 복제 및 스타일 조정
       const clonedCalendar = calendarElement.cloneNode(true) as HTMLElement;
@@ -56,12 +58,21 @@ const ImageDownload: React.FC = () => {
       exportWrapper.appendChild(clonedCalendar);
       document.body.appendChild(exportWrapper);
       
-      // 잠시 대기하여 렌더링 완료 보장
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // requestAnimationFrame을 2번 호출하여 렌더링 완료 보장
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
 
       // 실제 렌더링된 크기 확인
       const wrapperRect = exportWrapper.getBoundingClientRect();
-      console.log('Export wrapper dimensions:', wrapperRect.width, wrapperRect.height);
+      console.log('캡처 전 wrapper 사이즈:', wrapperRect.width, wrapperRect.height);
+      
+      // 크기가 0이면 렌더링이 완료되지 않은 것으로 판단
+      if (wrapperRect.width === 0 || wrapperRect.height === 0) {
+        throw new Error('래퍼 렌더링이 완료되지 않았습니다.');
+      }
 
       // dom-to-image-more를 사용하여 PNG 생성 (래퍼를 캡처)
       const dataUrl = await domtoimage.toPng(exportWrapper, {
