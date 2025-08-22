@@ -14,6 +14,9 @@ const ImageDownload: React.FC = () => {
     let originalScrollX = 0;
     let originalScrollY = 0;
     let originalHeight = '';
+    let originalWidth = '';
+    let originalMaxWidth = '';
+    let originalMargin = '';
     let calendarElement: HTMLElement | null = null;
     
     try {
@@ -29,31 +32,40 @@ const ImageDownload: React.FC = () => {
       originalScrollY = window.scrollY;
       window.scrollTo(0, 0);
       
-      // 요소 높이를 임시로 fit-content로 설정
+      // 캘린더 요소의 원래 스타일 저장
       originalHeight = calendarElement.style.height;
-      calendarElement.style.height = 'fit-content';
+      originalWidth = calendarElement.style.width;
+      originalMaxWidth = calendarElement.style.maxWidth;
+      originalMargin = calendarElement.style.margin;
+      
+      // 캘린더를 전체 크기로 임시 확장
+      calendarElement.style.width = 'auto';
+      calendarElement.style.maxWidth = 'none';
+      calendarElement.style.height = 'auto';
+      calendarElement.style.margin = '0';
+      calendarElement.style.position = 'relative';
+      calendarElement.style.transform = 'none';
       
       // 잠시 대기하여 렌더링 완료 보장
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 실제 렌더링된 크기 확인
+      const rect = calendarElement.getBoundingClientRect();
+      console.log('Calendar dimensions:', rect.width, rect.height);
+      console.log('Scroll dimensions:', calendarElement.scrollWidth, calendarElement.scrollHeight);
 
       const canvas = await html2canvas(calendarElement, {
         backgroundColor: '#ffffff',
-        scale: 2,
-        logging: true, // 디버깅을 위해 로깅 활성화
+        scale: 1, // 스케일을 1로 줄여서 안정성 확보
+        logging: true,
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
-        // 스크롤 오프셋 보정
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        // 윈도우 크기를 요소 크기에 맞춤
-        windowWidth: calendarElement.scrollWidth,
-        windowHeight: calendarElement.scrollHeight,
-        // 캡처 영역을 요소 전체로 설정
+        // 고정된 큰 윈도우 크기 사용
+        windowWidth: Math.max(1400, calendarElement.scrollWidth),
+        windowHeight: Math.max(1200, calendarElement.scrollHeight),
         width: calendarElement.scrollWidth,
         height: calendarElement.scrollHeight,
-        x: 0,
-        y: 0,
         onclone: (clonedDoc) => {
           // 클론된 문서에서 모든 텍스트 크기 유지
           const clonedElement = clonedDoc.getElementById('calendar-container');
@@ -108,6 +120,11 @@ const ImageDownload: React.FC = () => {
       // 원래 상태 복원
       if (calendarElement) {
         calendarElement.style.height = originalHeight;
+        calendarElement.style.width = originalWidth;
+        calendarElement.style.maxWidth = originalMaxWidth;
+        calendarElement.style.margin = originalMargin;
+        calendarElement.style.position = '';
+        calendarElement.style.transform = '';
       }
       window.scrollTo(originalScrollX, originalScrollY);
       setIsGenerating(false);
