@@ -28,7 +28,7 @@ const CalendarControls: React.FC = () => {
           gap: '0.75rem'
         }}>
           <div style={{
-            writing: 'vertical-rl',
+            writingMode: 'vertical-rl',
             textOrientation: 'mixed',
             fontSize: '0.875rem',
             fontWeight: '600',

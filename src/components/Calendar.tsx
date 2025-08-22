@@ -38,7 +38,7 @@ const Calendar: React.FC = () => {
             data-today={todayFlag ? 'true' : undefined}
             className={`text-2xl leading-none ${
               todayFlag 
-                ? 'bg-slate-800 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md'" 
+                ? 'bg-slate-800 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md' 
                 : isCurrentMonth 
                   ? 'text-slate-800 font-bold' 
                   : 'text-slate-400'
