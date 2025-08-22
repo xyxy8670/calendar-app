@@ -10,28 +10,50 @@ const ImageDownload: React.FC = () => {
   const generateCalendarImage = async () => {
     setIsGenerating(true);
     
+    // 상태 복원을 위한 변수들
+    let originalScrollX = 0;
+    let originalScrollY = 0;
+    let originalHeight = '';
+    let calendarElement: HTMLElement | null = null;
+    
     try {
       // 캘린더 컨테이너만 정확히 타겟팅 (월간메모 포함)
-      const calendarElement = document.getElementById('calendar-container');
+      calendarElement = document.getElementById('calendar-container');
       
       if (!calendarElement) {
         throw new Error('캘린더를 찾을 수 없습니다.');
       }
 
+      // 스크롤 위치 저장 및 최상단으로 이동
+      originalScrollX = window.scrollX;
+      originalScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+      
+      // 요소 높이를 임시로 fit-content로 설정
+      originalHeight = calendarElement.style.height;
+      calendarElement.style.height = 'fit-content';
+      
       // 잠시 대기하여 렌더링 완료 보장
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       const canvas = await html2canvas(calendarElement, {
         backgroundColor: '#ffffff',
-        scale: 2, // 안정적인 해상도로 조정
-        logging: false,
+        scale: 2,
+        logging: true, // 디버깅을 위해 로깅 활성화
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
-        width: calendarElement.scrollWidth + 80, // 좌우 여백 더 증가
-        height: calendarElement.scrollHeight + 100, // 상하 여백 더 증가
-        x: -40, // 시작점을 더 왼쪽으로 이동
-        y: -50, // 시작점을 더 위로 이동
+        // 스크롤 오프셋 보정
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        // 윈도우 크기를 요소 크기에 맞춤
+        windowWidth: calendarElement.scrollWidth,
+        windowHeight: calendarElement.scrollHeight,
+        // 캡처 영역을 요소 전체로 설정
+        width: calendarElement.scrollWidth,
+        height: calendarElement.scrollHeight,
+        x: 0,
+        y: 0,
         onclone: (clonedDoc) => {
           // 클론된 문서에서 모든 텍스트 크기 유지
           const clonedElement = clonedDoc.getElementById('calendar-container');
@@ -42,7 +64,7 @@ const ImageDownload: React.FC = () => {
             // 모든 텍스트 요소의 크기 강제 설정
             const textElements = clonedElement.querySelectorAll('*');
             textElements.forEach((el: any) => {
-              const originalEl = calendarElement.querySelector(`[data-clone-id="${el.dataset.cloneId}"]`) || el;
+              const originalEl = calendarElement?.querySelector(`[data-clone-id="${el.dataset.cloneId}"]`) || el;
               const computedStyle = window.getComputedStyle(originalEl);
               
               // 텍스트 크기 및 스타일 강제 적용
@@ -83,6 +105,11 @@ const ImageDownload: React.FC = () => {
       console.error('Image generation failed:', error);
       alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
+      // 원래 상태 복원
+      if (calendarElement) {
+        calendarElement.style.height = originalHeight;
+      }
+      window.scrollTo(originalScrollX, originalScrollY);
       setIsGenerating(false);
     }
   };
