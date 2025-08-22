@@ -14,13 +14,8 @@ const ImageDownload: React.FC = () => {
     // 상태 복원을 위한 변수들
     let originalScrollX = 0;
     let originalScrollY = 0;
-    let originalHeight = '';
-    let originalWidth = '';
-    let originalMaxWidth = '';
-    let originalMargin = '';
-    let originalFontSize = '';
-    let originalOverflow = '';
     let calendarElement: HTMLElement | null = null;
+    let exportWrapper: HTMLElement | null = null;
     
     try {
       // 캘린더 컨테이너만 정확히 타겟팅 (월간메모 포함)
@@ -35,42 +30,46 @@ const ImageDownload: React.FC = () => {
       originalScrollY = window.scrollY;
       window.scrollTo(0, 0);
       
-      // 캘린더 요소의 원래 스타일 저장
-      originalHeight = calendarElement.style.height;
-      originalWidth = calendarElement.style.width;
-      originalMaxWidth = calendarElement.style.maxWidth;
-      originalMargin = calendarElement.style.margin;
-      originalFontSize = calendarElement.style.fontSize;
+      // 이미지 저장용 래퍼 생성
+      exportWrapper = document.createElement('div');
+      exportWrapper.id = 'calendar-export-wrapper';
+      exportWrapper.style.padding = '48px';
+      exportWrapper.style.backgroundColor = '#ffffff';
+      exportWrapper.style.boxSizing = 'border-box';
+      exportWrapper.style.width = 'auto';
+      exportWrapper.style.height = 'auto';
+      exportWrapper.style.position = 'absolute';
+      exportWrapper.style.top = '-9999px'; // 화면 밖에 위치
+      exportWrapper.style.left = '-9999px';
       
-      // 캘린더를 더 작은 크기로 조정
-      calendarElement.style.width = '800px'; // 고정 너비로 작게 설정
-      calendarElement.style.maxWidth = '800px';
-      calendarElement.style.height = 'auto';
-      calendarElement.style.margin = '0';
-      calendarElement.style.position = 'relative';
-      calendarElement.style.transform = 'none';
-      calendarElement.style.fontSize = '14px'; // 폰트 크기도 작게
+      // 캘린더 복제 및 스타일 조정
+      const clonedCalendar = calendarElement.cloneNode(true) as HTMLElement;
+      clonedCalendar.style.width = '800px';
+      clonedCalendar.style.maxWidth = '800px';
+      clonedCalendar.style.height = 'auto';
+      clonedCalendar.style.margin = '0';
+      clonedCalendar.style.position = 'relative';
+      clonedCalendar.style.transform = 'none';
+      clonedCalendar.style.fontSize = '14px';
+      
+      // 래퍼에 복제된 캘린더 추가
+      exportWrapper.appendChild(clonedCalendar);
+      document.body.appendChild(exportWrapper);
       
       // 잠시 대기하여 렌더링 완료 보장
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // 실제 렌더링된 크기 확인
-      const rect = calendarElement.getBoundingClientRect();
-      console.log('Calendar dimensions:', rect.width, rect.height);
-      console.log('Scroll dimensions:', calendarElement.scrollWidth, calendarElement.scrollHeight);
+      const wrapperRect = exportWrapper.getBoundingClientRect();
+      console.log('Export wrapper dimensions:', wrapperRect.width, wrapperRect.height);
 
-      // 오버플로우 문제 해결을 위한 임시 설정
-      originalOverflow = calendarElement.style.overflow;
-      calendarElement.style.overflow = 'visible';
-      
-      // dom-to-image-more를 사용하여 PNG 생성
-      const dataUrl = await domtoimage.toPng(calendarElement, {
+      // dom-to-image-more를 사용하여 PNG 생성 (래퍼를 캡처)
+      const dataUrl = await domtoimage.toPng(exportWrapper, {
         quality: 1.0,
         bgcolor: '#ffffff',
         scale: 2, // 고해상도
         style: {
-          fontFamily: "'OnglipBakdahyeonche', sans-serif",
-          overflow: 'visible'
+          fontFamily: "'OnglipBakdahyeonche', sans-serif"
         },
         filter: function() {
           // 모든 노드를 포함
@@ -78,8 +77,8 @@ const ImageDownload: React.FC = () => {
         }
       });
       
-      // 오버플로우 복원
-      calendarElement.style.overflow = originalOverflow;
+      // 임시로 생성한 래퍼 제거
+      document.body.removeChild(exportWrapper);
 
       // 직접 다운로드
       const link = document.createElement('a');
@@ -94,17 +93,11 @@ const ImageDownload: React.FC = () => {
       console.error('Image generation failed:', error);
       alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
-      // 원래 상태 복원
-      if (calendarElement) {
-        calendarElement.style.height = originalHeight;
-        calendarElement.style.width = originalWidth;
-        calendarElement.style.maxWidth = originalMaxWidth;
-        calendarElement.style.margin = originalMargin;
-        calendarElement.style.fontSize = originalFontSize;
-        calendarElement.style.overflow = originalOverflow;
-        calendarElement.style.position = '';
-        calendarElement.style.transform = '';
+      // 래퍼 제거 (에러 발생 시에도 보장)
+      if (exportWrapper && document.body.contains(exportWrapper)) {
+        document.body.removeChild(exportWrapper);
       }
+      // 스크롤 위치 복원
       window.scrollTo(originalScrollX, originalScrollY);
       setIsGenerating(false);
     }
