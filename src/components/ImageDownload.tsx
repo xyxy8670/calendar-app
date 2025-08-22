@@ -28,10 +28,10 @@ const ImageDownload: React.FC = () => {
         useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
-        width: calendarElement.scrollWidth + 40, // 좌우 여백 추가
-        height: calendarElement.scrollHeight + 40, // 상하 여백 추가
-        x: -20, // 시작점을 왼쪽으로 이동
-        y: -20, // 시작점을 위로 이동
+        width: calendarElement.scrollWidth + 80, // 좌우 여백 더 증가
+        height: calendarElement.scrollHeight + 100, // 상하 여백 더 증가
+        x: -40, // 시작점을 더 왼쪽으로 이동
+        y: -50, // 시작점을 더 위로 이동
         onclone: (clonedDoc) => {
           // 클론된 문서에서 모든 텍스트 크기 유지
           const clonedElement = clonedDoc.getElementById('calendar-container');
