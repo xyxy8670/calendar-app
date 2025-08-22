@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import * as htmlToImage from 'html-to-image';
+// @ts-ignore
+import domtoimage from 'dom-to-image-more';
 import { useCalendar } from '../contexts/CalendarContext';
 import { formatDateForDisplay } from '../utils/dateUtils';
 
@@ -18,6 +19,7 @@ const ImageDownload: React.FC = () => {
     let originalMaxWidth = '';
     let originalMargin = '';
     let originalFontSize = '';
+    let originalOverflow = '';
     let calendarElement: HTMLElement | null = null;
     
     try {
@@ -57,19 +59,27 @@ const ImageDownload: React.FC = () => {
       console.log('Calendar dimensions:', rect.width, rect.height);
       console.log('Scroll dimensions:', calendarElement.scrollWidth, calendarElement.scrollHeight);
 
-      // html-to-image를 사용하여 PNG 생성
-      const dataUrl = await htmlToImage.toPng(calendarElement, {
+      // 오버플로우 문제 해결을 위한 임시 설정
+      originalOverflow = calendarElement.style.overflow;
+      calendarElement.style.overflow = 'visible';
+      
+      // dom-to-image-more를 사용하여 PNG 생성
+      const dataUrl = await domtoimage.toPng(calendarElement, {
         quality: 1.0,
-        backgroundColor: '#ffffff',
-        pixelRatio: 2, // 고해상도
+        bgcolor: '#ffffff',
+        scale: 2, // 고해상도
         style: {
-          fontFamily: "'OnglipBakdahyeonche', sans-serif"
+          fontFamily: "'OnglipBakdahyeonche', sans-serif",
+          overflow: 'visible'
         },
-        filter: () => {
+        filter: function() {
           // 모든 노드를 포함
           return true;
         }
       });
+      
+      // 오버플로우 복원
+      calendarElement.style.overflow = originalOverflow;
 
       // 직접 다운로드
       const link = document.createElement('a');
@@ -91,6 +101,7 @@ const ImageDownload: React.FC = () => {
         calendarElement.style.maxWidth = originalMaxWidth;
         calendarElement.style.margin = originalMargin;
         calendarElement.style.fontSize = originalFontSize;
+        calendarElement.style.overflow = originalOverflow;
         calendarElement.style.position = '';
         calendarElement.style.transform = '';
       }
