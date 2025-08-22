@@ -15,7 +15,7 @@ const ImageDownload: React.FC = () => {
     let originalScrollX = 0;
     let originalScrollY = 0;
     let calendarElement: HTMLElement | null = null;
-    let exportWrapper: HTMLElement | null = null;
+    let originalStyles: any = {};
     
     try {
       // 캘린더 컨테이너만 정확히 타겟팅 (월간메모 포함)
@@ -30,66 +30,53 @@ const ImageDownload: React.FC = () => {
       originalScrollY = window.scrollY;
       window.scrollTo(0, 0);
       
-      // 이미지 저장용 래퍼 생성
-      exportWrapper = document.createElement('div');
-      exportWrapper.id = 'calendar-export-wrapper';
-      exportWrapper.style.padding = '48px';
-      exportWrapper.style.backgroundColor = '#ffffff';
-      exportWrapper.style.boxSizing = 'border-box';
-      exportWrapper.style.width = '1000px'; // 고정 너비 지정
-      exportWrapper.style.height = 'auto';
-      exportWrapper.style.position = 'absolute';
-      exportWrapper.style.top = '-9999px'; // 화면 밖에 위치
-      exportWrapper.style.left = '-9999px';
-      exportWrapper.style.display = 'block'; // 명시적으로 block 지정
-      exportWrapper.style.visibility = 'hidden'; // 보이지 않지만 렌더링은 됨
+      // 원본 캘린더의 스타일 저장
+      originalStyles = {
+        width: calendarElement.style.width,
+        maxWidth: calendarElement.style.maxWidth,
+        margin: calendarElement.style.margin,
+        padding: calendarElement.style.padding,
+        position: calendarElement.style.position,
+        transform: calendarElement.style.transform,
+        fontSize: calendarElement.style.fontSize,
+        backgroundColor: calendarElement.style.backgroundColor
+      };
       
-      // 캘린더 복제 및 스타일 조정
-      const clonedCalendar = calendarElement.cloneNode(true) as HTMLElement;
-      clonedCalendar.style.width = '800px';
-      clonedCalendar.style.maxWidth = '800px';
-      clonedCalendar.style.height = 'auto';
-      clonedCalendar.style.margin = '0';
-      clonedCalendar.style.position = 'relative';
-      clonedCalendar.style.transform = 'none';
-      clonedCalendar.style.fontSize = '14px';
+      // 캘린더에 직접 이미지 캡처용 스타일 적용
+      calendarElement.style.width = '800px';
+      calendarElement.style.maxWidth = '800px';
+      calendarElement.style.margin = '48px'; // 패딩 역할
+      calendarElement.style.padding = '0';
+      calendarElement.style.position = 'relative';
+      calendarElement.style.transform = 'none';
+      calendarElement.style.fontSize = '14px';
+      calendarElement.style.backgroundColor = '#ffffff';
       
-      // 래퍼에 복제된 캘린더 추가
-      exportWrapper.appendChild(clonedCalendar);
-      document.body.appendChild(exportWrapper);
-      
-      // requestAnimationFrame을 2번 호출하여 렌더링 완료 보장
+      // 렌더링 완료 대기
       await new Promise(resolve => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(resolve); // 3번 호출로 확실히 대기
+          });
         });
       });
 
       // 실제 렌더링된 크기 확인
-      const wrapperRect = exportWrapper.getBoundingClientRect();
-      console.log('캡처 전 wrapper 사이즈:', wrapperRect.width, wrapperRect.height);
-      
-      // 크기가 0이면 렌더링이 완료되지 않은 것으로 판단
-      if (wrapperRect.width === 0 || wrapperRect.height === 0) {
-        throw new Error('래퍼 렌더링이 완료되지 않았습니다.');
-      }
+      const rect = calendarElement.getBoundingClientRect();
+      console.log('캡처 전 캘린더 사이즈:', rect.width, rect.height);
 
-      // dom-to-image-more를 사용하여 PNG 생성 (래퍼를 캡처)
-      const dataUrl = await domtoimage.toPng(exportWrapper, {
+      // dom-to-image-more를 사용하여 PNG 생성 (원본 캘린더 직접 캡처)
+      const dataUrl = await domtoimage.toPng(calendarElement, {
         quality: 1.0,
         bgcolor: '#ffffff',
-        scale: 2, // 고해상도
+        scale: 1, // 스케일 1로 안정성 확보
         style: {
           fontFamily: "'OnglipBakdahyeonche', sans-serif"
         },
         filter: function() {
-          // 모든 노드를 포함
           return true;
         }
       });
-      
-      // 임시로 생성한 래퍼 제거
-      document.body.removeChild(exportWrapper);
 
       // 직접 다운로드
       const link = document.createElement('a');
@@ -104,9 +91,11 @@ const ImageDownload: React.FC = () => {
       console.error('Image generation failed:', error);
       alert('이미지 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
-      // 래퍼 제거 (에러 발생 시에도 보장)
-      if (exportWrapper && document.body.contains(exportWrapper)) {
-        document.body.removeChild(exportWrapper);
+      // 원본 캘린더 스타일 복원
+      if (calendarElement) {
+        Object.keys(originalStyles).forEach(key => {
+          calendarElement!.style[key as any] = originalStyles[key];
+        });
       }
       // 스크롤 위치 복원
       window.scrollTo(originalScrollX, originalScrollY);
