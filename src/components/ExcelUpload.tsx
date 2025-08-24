@@ -8,7 +8,7 @@ import { isValidDate } from '../utils/dateUtils';
 const ExcelUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { state, setEvents } = useCalendar();
-  const { eventTypes } = state;
+  const { eventTypes, textSettings } = state;
   const [isDragOver, setIsDragOver] = useState(false);
 
   const processFile = (file: File) => {
@@ -229,7 +229,7 @@ const ExcelUpload: React.FC = () => {
             transition: 'all 0.3s ease',
             fontSize: '16px',
             fontWeight: '500',
-            fontFamily: "'OnglipBakdahyeonche', sans-serif"
+            fontFamily: textSettings.fontFamily
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#e2e8f0';

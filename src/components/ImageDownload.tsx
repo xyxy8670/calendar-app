@@ -5,6 +5,7 @@ import { formatDateForDisplay } from '../utils/dateUtils';
 
 const ImageDownload: React.FC = () => {
   const { state } = useCalendar();
+  const { textSettings } = state;
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateCalendarImage = async () => {
@@ -74,7 +75,7 @@ const ImageDownload: React.FC = () => {
           const clonedElement = clonedDoc.getElementById('calendar-container');
           if (clonedElement) {
             clonedElement.style.cssText = `
-              font-family: 'OnglipBakdahyeonche', sans-serif !important;
+              font-family: ${textSettings.fontFamily} !important;
               width: ${fixedWidth}px !important;
               min-width: ${fixedWidth}px !important;
               max-width: ${fixedWidth}px !important;

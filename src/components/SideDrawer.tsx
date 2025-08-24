@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useCalendar } from '../contexts/CalendarContext';
 import ExcelUpload from './ExcelUpload';
 import ManualEventForm from './ManualEventForm';
 import EventTypeManager from './EventTypeManager';
 import ImageDownload from './ImageDownload';
-import CommonEvents from './CommonEvents';
 import TextSettings from './TextSettings';
 
 interface SideDrawerProps {
@@ -11,8 +11,10 @@ interface SideDrawerProps {
 }
 
 const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) => {
+  const { state } = useCalendar();
+  const { textSettings } = state;
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'input' | 'types' | 'memo' | 'text' | 'download'>('input');
+  const [activeTab, setActiveTab] = useState<'input' | 'types' | 'text' | 'download'>('input');
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -22,7 +24,6 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
   const tabs = [
     { id: 'input', label: '일정 추가' },
     { id: 'types', label: '일정 유형' },
-    { id: 'memo', label: '월간 메모' },
     { id: 'text', label: '텍스트 설정' },
     { id: 'download', label: '내보내기' },
   ];
@@ -50,7 +51,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
             cursor: 'pointer',
             fontSize: '1rem',
             fontWeight: '600',
-            fontFamily: "'OnglipBakdahyeonche', sans-serif",
+            fontFamily: textSettings.fontFamily,
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             display: 'flex',
             alignItems: 'center',
@@ -83,7 +84,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
           boxShadow: '-10px 0 25px -5px rgba(0, 0, 0, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           transition: 'right 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 50,
-          fontFamily: "'OnglipBakdahyeonche', sans-serif",
+          fontFamily: textSettings.fontFamily,
           borderLeft: '1px solid #e2e8f0',
           display: 'flex',
           flexDirection: 'column'
@@ -128,7 +129,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
                   cursor: 'pointer',
                   fontSize: '1rem',
                   fontWeight: '600',
-                  fontFamily: "'OnglipBakdahyeonche', sans-serif",
+                  fontFamily: textSettings.fontFamily,
                   background: activeTab === tab.id 
                     ? 'linear-gradient(135deg, #1e293b, #334155)' 
                     : 'linear-gradient(135deg, #ffffff, #f8fafc)',
@@ -217,18 +218,6 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ className: _className = '' }) =
             </div>
           )}
 
-          {activeTab === 'memo' && (
-            <div style={{
-              backgroundColor: 'transparent',
-              borderRadius: '12px',
-              padding: '20px',
-              border: '1px solid #d1d5db',
-              boxSizing: 'border-box',
-              overflow: 'hidden'
-            }}>
-              <CommonEvents />
-            </div>
-          )}
 
           {activeTab === 'text' && (
             <div style={{

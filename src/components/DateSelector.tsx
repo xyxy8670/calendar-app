@@ -3,7 +3,7 @@ import { useCalendar } from '../contexts/CalendarContext';
 
 const DateSelector: React.FC = () => {
   const { state, setYear, setMonth } = useCalendar();
-  const { year, month } = state;
+  const { year, month, textSettings } = state;
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
@@ -42,7 +42,7 @@ const DateSelector: React.FC = () => {
 
   return (
     <div style={{
-      fontFamily: "'OnglipBakdahyeonche', sans-serif",
+      fontFamily: textSettings.fontFamily,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -131,7 +131,7 @@ const DateSelector: React.FC = () => {
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 minWidth: '80px',
                 textAlign: 'center',
-                fontFamily: "'OnglipBakdahyeonche', sans-serif"
+                fontFamily: textSettings.fontFamily
               }}
             >
               {years.map((y) => (
@@ -174,7 +174,7 @@ const DateSelector: React.FC = () => {
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 minWidth: '80px',
                 textAlign: 'center',
-                fontFamily: "'OnglipBakdahyeonche', sans-serif"
+                fontFamily: textSettings.fontFamily
               }}
             >
               {months.map((m) => (
