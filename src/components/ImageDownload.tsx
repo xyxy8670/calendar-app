@@ -26,23 +26,46 @@ const ImageDownload: React.FC = () => {
       // 렌더링 완료 대기
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // html2canvas를 사용하여 캘린더 캡처
+      // 고정된 크기로 캘린더 캡처 (창 크기와 무관)
+      const fixedWidth = 1600;
+      const fixedHeight = Math.max(1200, calendarElement.scrollHeight + 100);
+      
       const canvas = await html2canvas(calendarElement, {
         allowTaint: true,
         useCORS: true,
         scale: 2, // 고해상도를 위한 스케일
         backgroundColor: '#ffffff',
-        width: Math.max(1400, calendarElement.offsetWidth),
-        height: calendarElement.offsetHeight,
+        width: fixedWidth,
+        height: fixedHeight,
         scrollX: 0,
         scrollY: 0,
         logging: false,
+        windowWidth: fixedWidth,
+        windowHeight: fixedHeight,
         onclone: (clonedDoc) => {
-          // 클론된 문서에서 폰트 적용
+          // 클론된 문서에서 폰트 및 크기 고정
           const clonedElement = clonedDoc.getElementById('calendar-container');
           if (clonedElement) {
             clonedElement.style.fontFamily = "'OnglipBakdahyeonche', sans-serif";
-            clonedElement.style.width = Math.max(1400, calendarElement.offsetWidth) + 'px';
+            clonedElement.style.width = fixedWidth + 'px';
+            clonedElement.style.minWidth = fixedWidth + 'px';
+            clonedElement.style.maxWidth = fixedWidth + 'px';
+            clonedElement.style.padding = '20px';
+            clonedElement.style.boxSizing = 'border-box';
+            
+            // 캘린더 내부 요소들도 고정 크기로 설정
+            const calendarGrid = clonedElement.querySelector('.calendar-grid, div[style*="grid-template-columns"]');
+            if (calendarGrid) {
+              (calendarGrid as HTMLElement).style.width = '100%';
+              (calendarGrid as HTMLElement).style.minWidth = '100%';
+            }
+            
+            // 날짜 셀들이 제대로 표시되도록 설정
+            const dateCells = clonedElement.querySelectorAll('div[style*="min-height"]');
+            dateCells.forEach(cell => {
+              (cell as HTMLElement).style.minHeight = '120px';
+              (cell as HTMLElement).style.height = 'auto';
+            });
           }
         }
       });

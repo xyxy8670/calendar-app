@@ -109,9 +109,13 @@ const Calendar: React.FC = () => {
       <div style={{
         backgroundColor: '#1f2937',
         color: '#ffffff',
-        padding: '24px',
+        padding: '32px 24px',
         borderRadius: '12px 12px 0 0',
-        textAlign: 'center'
+        textAlign: 'center',
+        minHeight: '100px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
         <DateSelector />
       </div>

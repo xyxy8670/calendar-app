@@ -41,62 +41,194 @@ const DateSelector: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center space-x-4 bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border border-white border-opacity-30" style={{fontFamily: "'OnglipBakdahyeonche', sans-serif"}}>
-      <button
-        onClick={goToPrevious}
-        className="p-3 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all duration-300 text-slate-700 hover:text-slate-900 hover:scale-105 shadow-sm hover:shadow-md"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      
-      <div className="flex items-center space-x-3">
-        <div className="relative">
-          <select
-            id="year"
-            value={year}
-            onChange={(e) => setYear(parseInt(e.target.value))}
-            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-3xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[6.25rem] text-center"
-          >
-            {years.map((y) => (
-              <option key={y} value={y} className="bg-white text-slate-800">
-                {y}
-              </option>
-            ))}
-          </select>
-          <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        
-        <div className="relative">
-          <select
-            id="month"
-            value={month}
-            onChange={(e) => setMonth(parseInt(e.target.value))}
-            className="appearance-none bg-slate-100 hover:bg-slate-200 focus:bg-slate-200 border border-slate-300 focus:border-slate-500 rounded-xl px-4 py-3 pr-10 text-slate-800 font-bold text-3xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-300 shadow-sm hover:shadow-md min-w-[10rem] text-center"
-          >
-            {months.map((m) => (
-              <option key={m.value} value={m.value} className="bg-white text-slate-800">
-                {m.label}
-              </option>
-            ))}
-          </select>
-          <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+    <div style={{
+      fontFamily: "'OnglipBakdahyeonche', sans-serif",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '12px',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(8px)',
+      borderRadius: '16px',
+      padding: '20px 32px',
+      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      margin: '0 auto',
+      maxWidth: 'fit-content',
+      width: 'auto'
+    }}>
+      {/* 큰 텍스트로 년월 표시 */}
+      <div style={{
+        fontSize: '32px',
+        fontWeight: 'bold',
+        color: '#1e293b',
+        textAlign: 'center',
+        lineHeight: '1.2',
+        marginBottom: '8px'
+      }}>
+        {year}년 {months.find(m => m.value === month)?.label}
       </div>
+      
+      {/* 컨트롤 버튼들 */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px'
+      }}>
+        <button
+          onClick={goToPrevious}
+          style={{
+            padding: '10px',
+            backgroundColor: '#f1f5f9',
+            borderRadius: '12px',
+            border: 'none',
+            color: '#475569',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#e2e8f0';
+            e.currentTarget.style.color = '#1e293b';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#f1f5f9';
+            e.currentTarget.style.color = '#475569';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
 
-      <button
-        onClick={goToNext}
-        className="p-3 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all duration-300 text-slate-700 hover:text-slate-900 hover:scale-105 shadow-sm hover:shadow-md"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{ position: 'relative' }}>
+            <select
+              id="year"
+              value={year}
+              onChange={(e) => setYear(parseInt(e.target.value))}
+              style={{
+                appearance: 'none',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '8px 32px 8px 12px',
+                color: '#1e293b',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                minWidth: '80px',
+                textAlign: 'center',
+                fontFamily: "'OnglipBakdahyeonche', sans-serif"
+              }}
+            >
+              {years.map((y) => (
+                <option key={y} value={y} style={{ backgroundColor: '#ffffff', color: '#1e293b' }}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <svg style={{
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '14px',
+              height: '14px',
+              color: '#64748b',
+              pointerEvents: 'none'
+            }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          
+          <div style={{ position: 'relative' }}>
+            <select
+              id="month"
+              value={month}
+              onChange={(e) => setMonth(parseInt(e.target.value))}
+              style={{
+                appearance: 'none',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '8px 32px 8px 12px',
+                color: '#1e293b',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                minWidth: '80px',
+                textAlign: 'center',
+                fontFamily: "'OnglipBakdahyeonche', sans-serif"
+              }}
+            >
+              {months.map((m) => (
+                <option key={m.value} value={m.value} style={{ backgroundColor: '#ffffff', color: '#1e293b' }}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <svg style={{
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '14px',
+              height: '14px',
+              color: '#64748b',
+              pointerEvents: 'none'
+            }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <button
+          onClick={goToNext}
+          style={{
+            padding: '10px',
+            backgroundColor: '#f1f5f9',
+            borderRadius: '12px',
+            border: 'none',
+            color: '#475569',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#e2e8f0';
+            e.currentTarget.style.color = '#1e293b';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#f1f5f9';
+            e.currentTarget.style.color = '#475569';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
