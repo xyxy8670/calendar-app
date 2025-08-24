@@ -16,6 +16,7 @@ export interface TextSettings {
   eventTextColor: string; // CSS 색상 값 (예: '#000000')
   memoFontSize: string;
   memoTextColor: string;
+  fontFamily: string; // 글꼴 설정
 }
 
 export interface CalendarSize {
@@ -31,6 +32,7 @@ export interface CalendarState {
   commonEvents: string;
   textSettings: TextSettings;
   calendarSize: CalendarSize;
+  headerColor: string; // 헤더 배경색
 }
 
 export interface CalendarDay {
@@ -64,8 +66,26 @@ export const DEFAULT_TEXT_SETTINGS: TextSettings = {
   eventFontSize: '0.875rem',
   eventTextColor: '#1e293b', 
   memoFontSize: '1rem',
-  memoTextColor: '#374151'
+  memoTextColor: '#374151',
+  fontFamily: "'OnglipBakdahyeonche', sans-serif"
 };
+
+export const FONT_OPTIONS = [
+  { name: '온글잎 박다현체', value: "'OnglipBakdahyeonche', sans-serif" },
+  { name: 'Pretendard', value: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif" },
+  { name: '나눔고딕', value: "'Nanum Gothic', sans-serif" },
+  { name: '맑은 고딕', value: "'Malgun Gothic', sans-serif" },
+  { name: '시스템 기본', value: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }
+];
+
+export const HEADER_COLOR_OPTIONS = [
+  { name: '다크 그레이', value: '#1f2937' },
+  { name: '블루', value: '#1e40af' },
+  { name: '그린', value: '#166534' },
+  { name: '퍼플', value: '#7c2d91' },
+  { name: '인디고', value: '#3730a3' },
+  { name: '레드', value: '#dc2626' }
+];
 
 export const DEFAULT_CALENDAR_SIZE: CalendarSize = {
   width: 70,

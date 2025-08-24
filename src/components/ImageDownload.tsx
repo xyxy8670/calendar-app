@@ -28,50 +28,103 @@ const ImageDownload: React.FC = () => {
 
       // 고정된 크기로 캘린더 캡처 (창 크기와 무관)
       const fixedWidth = 1600;
-      const fixedHeight = Math.max(1200, calendarElement.scrollHeight + 100);
+      
+      // 실제 월간메모 박스의 정확한 하단 위치 계산
+      const monthlyMemoElement = calendarElement.querySelector('#monthly-memo');
+      let actualContentHeight = calendarElement.scrollHeight;
+      
+      if (monthlyMemoElement) {
+        const rect = monthlyMemoElement.getBoundingClientRect();
+        const containerRect = calendarElement.getBoundingClientRect();
+        actualContentHeight = rect.bottom - containerRect.top + 70; // 컨테이너 패딩(20px) + 하단 여백(50px)
+      }
       
       const canvas = await html2canvas(calendarElement, {
         allowTaint: true,
         useCORS: true,
-        scale: 2, // 고해상도를 위한 스케일
+        scale: 2,
         backgroundColor: '#ffffff',
         width: fixedWidth,
-        height: fixedHeight,
+        height: actualContentHeight,
         scrollX: 0,
         scrollY: 0,
         logging: false,
         windowWidth: fixedWidth,
-        windowHeight: fixedHeight,
+        windowHeight: actualContentHeight,
+        removeContainer: true, // 컨테이너 제거로 여백 최소화
         onclone: (clonedDoc) => {
-          // 클론된 문서에서 폰트 및 크기 고정
+          // 클론된 문서에서 모든 여백 강제 제거
+          clonedDoc.documentElement.style.cssText = `
+            margin: 0 !important;
+            padding: 0 !important;
+            width: ${fixedWidth}px !important;
+            height: ${actualContentHeight}px !important;
+            overflow: hidden !important;
+          `;
+          
+          clonedDoc.body.style.cssText = `
+            margin: 0 !important;
+            padding: 0 !important;
+            width: ${fixedWidth}px !important;
+            height: ${actualContentHeight}px !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+          `;
+          
           const clonedElement = clonedDoc.getElementById('calendar-container');
           if (clonedElement) {
-            clonedElement.style.fontFamily = "'OnglipBakdahyeonche', sans-serif";
-            clonedElement.style.width = fixedWidth + 'px';
-            clonedElement.style.minWidth = fixedWidth + 'px';
-            clonedElement.style.maxWidth = fixedWidth + 'px';
-            clonedElement.style.padding = '20px';
-            clonedElement.style.boxSizing = 'border-box';
+            clonedElement.style.cssText = `
+              font-family: 'OnglipBakdahyeonche', sans-serif !important;
+              width: ${fixedWidth}px !important;
+              min-width: ${fixedWidth}px !important;
+              max-width: ${fixedWidth}px !important;
+              padding: 20px !important;
+              box-sizing: border-box !important;
+              margin: 0 !important;
+              overflow: visible !important;
+              background-color: #ffffff !important;
+              border-radius: 16px !important;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            `;
             
-            // 캘린더 내부 요소들도 고정 크기로 설정
-            const calendarGrid = clonedElement.querySelector('.calendar-grid, div[style*="grid-template-columns"]');
+            // 캘린더 내부 요소들 최적화
+            const calendarGrid = clonedElement.querySelector('div[style*="grid-template-columns"]');
             if (calendarGrid) {
               (calendarGrid as HTMLElement).style.width = '100%';
               (calendarGrid as HTMLElement).style.minWidth = '100%';
             }
             
-            // 날짜 셀들이 제대로 표시되도록 설정
+            // 날짜 셀들 높이 고정
             const dateCells = clonedElement.querySelectorAll('div[style*="min-height"]');
             dateCells.forEach(cell => {
               (cell as HTMLElement).style.minHeight = '120px';
               (cell as HTMLElement).style.height = 'auto';
             });
+            
+            // 월간메모 섹션 하단 여백 완전 제거
+            const monthlyMemo = clonedElement.querySelector('#monthly-memo');
+            if (monthlyMemo) {
+              (monthlyMemo as HTMLElement).style.marginBottom = '0 !important';
+              (monthlyMemo as HTMLElement).style.paddingBottom = '24px !important';
+              (monthlyMemo as HTMLElement).style.borderRadius = '0 0 12px 12px !important';
+            }
           }
         }
       });
 
-      // Canvas를 Blob으로 변환하여 다운로드
-      canvas.toBlob((blob) => {
+      // 캔버스에서 실제 내용만 잘라내기 (여백 제거)
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d')!;
+      
+      // 실제 내용 영역만 계산
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = Math.min(canvas.height, actualContentHeight * 2); // scale 2 적용
+      
+      // 원본 캔버스에서 필요한 부분만 복사
+      tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+
+      // 수정된 캔버스를 Blob으로 변환하여 다운로드
+      tempCanvas.toBlob((blob) => {
         if (blob) {
           const link = document.createElement('a');
           link.download = `calendar-${state.year}-${state.month.toString().padStart(2, '0')}.png`;

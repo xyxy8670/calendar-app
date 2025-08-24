@@ -17,6 +17,7 @@ interface CalendarContextType {
   setCommonEvents: (commonEvents: string) => void;
   updateTextSettings: (textSettings: Partial<TextSettings>) => void;
   updateCalendarSize: (calendarSize: CalendarSize) => void;
+  setHeaderColor: (color: string) => void;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
@@ -43,6 +44,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     commonEvents: '',
     textSettings: DEFAULT_TEXT_SETTINGS,
     calendarSize: DEFAULT_CALENDAR_SIZE,
+    headerColor: '#1f2937',
   });
 
   const setYear = (year: number) => {
@@ -126,6 +128,10 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     setState(prev => ({ ...prev, calendarSize }));
   };
 
+  const setHeaderColor = (color: string) => {
+    setState(prev => ({ ...prev, headerColor: color }));
+  };
+
   const value: CalendarContextType = {
     state,
     setYear,
@@ -140,6 +146,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     setCommonEvents,
     updateTextSettings,
     updateCalendarSize,
+    setHeaderColor,
   };
 
   return (
