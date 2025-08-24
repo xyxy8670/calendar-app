@@ -25,49 +25,63 @@ const Calendar: React.FC = () => {
     return (
       <div
         key={`${year}-${month}-${day}-${index}`}
-        data-cell
-        data-date-value={day}
-        className={`relative min-h-[6.25rem] h-auto border-b border-slate-200 p-3 hover:bg-slate-50 transition-colors duration-200 flex flex-col ${
-          isCurrentMonth ? 'bg-white' : 'bg-slate-50'
-        }`}
-        style={{ aspectRatio: '1.2 / 1' }}
+        className={`calendar-day ${isCurrentMonth ? 'current-month' : 'other-month'}`}
+        style={{
+          border: '1px solid #e2e8f0',
+          minHeight: '120px',
+          padding: '8px',
+          backgroundColor: isCurrentMonth ? '#ffffff' : '#f8fafc',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative'
+        }}
       >
-        <div className="flex items-center justify-between mb-2 flex-shrink-0">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px'
+        }}>
           <span 
-            data-date
-            data-today={todayFlag ? 'true' : undefined}
-            className={`text-2xl leading-none ${
-              todayFlag 
-                ? 'bg-slate-800 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md' 
-                : isCurrentMonth 
-                  ? 'text-slate-800 font-bold' 
-                  : 'text-slate-400'
-            }`}
+            style={{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: todayFlag ? '#ffffff' : (isCurrentMonth ? '#1f2937' : '#9ca3af'),
+              backgroundColor: todayFlag ? '#1f2937' : 'transparent',
+              borderRadius: todayFlag ? '50%' : '0',
+              width: todayFlag ? '28px' : 'auto',
+              height: todayFlag ? '28px' : 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
             {day}
           </span>
-          {dayEvents.length > 3 && (
-            <span className="text-sm text-slate-500 font-medium mt-auto">
-              +{dayEvents.length - 3} more
-            </span>
-          )}
         </div>
         
-        <div className="space-y-1 flex-1 overflow-hidden">
-          {dayEvents.slice(0, 3).map((event) => (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          flex: 1
+        }}>
+          {dayEvents.map((event) => (
             <div
               key={event.id}
-              data-event
-              className="px-2 py-1 rounded-lg font-medium border leading-tight"
-              style={{ 
-                backgroundColor: event.type.color + '15', 
-                borderColor: event.type.color + '40',
+              style={{
+                backgroundColor: event.type.color + '20',
+                borderLeft: `3px solid ${event.type.color}`,
+                padding: '4px 8px',
+                borderRadius: '4px',
                 fontSize: textSettings.eventFontSize,
-                color: textSettings.eventTextColor
+                color: textSettings.eventTextColor,
+                wordBreak: 'break-word',
+                lineHeight: '1.2'
               }}
               title={event.title}
             >
-              <div className="truncate">{event.title}</div>
+              {event.title}
             </div>
           ))}
         </div>
@@ -76,26 +90,50 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <div id="calendar-container" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" style={{
-      fontFamily: "'OnglipBakdahyeonche', sans-serif",
-      width: '90%',
-      maxWidth: '80rem',
-      margin: '2rem auto 3rem auto'
-    }}>
-      {/* Calendar Header with DateSelector */}
-      <div className="bg-slate-800 text-white py-4 md:py-8 px-4 md:px-8 relative">
-        <div className="flex justify-center">
-          <DateSelector />
-        </div>
+    <div 
+      id="calendar-container" 
+      style={{
+        fontFamily: "'OnglipBakdahyeonche', sans-serif",
+        width: '100vw',
+        minWidth: '100vw',
+        maxWidth: '100vw',
+        margin: '0',
+        padding: '20px',
+        boxSizing: 'border-box',
+        backgroundColor: '#ffffff',
+        borderRadius: '16px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      {/* Calendar Header */}
+      <div style={{
+        backgroundColor: '#1f2937',
+        color: '#ffffff',
+        padding: '24px',
+        borderRadius: '12px 12px 0 0',
+        textAlign: 'center'
+      }}>
+        <DateSelector />
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 bg-slate-50">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        backgroundColor: '#f8fafc',
+        borderTop: '1px solid #e2e8f0'
+      }}>
         {weekdays.map((weekday) => (
           <div 
-            key={weekday} 
-            data-weekday
-            className="py-3 px-2 text-center text-xl font-bold text-slate-600 border-b border-slate-200 min-h-[3.75rem] flex items-center justify-center"
+            key={weekday}
+            style={{
+              padding: '16px 8px',
+              textAlign: 'center',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: '#64748b',
+              borderRight: '1px solid #e2e8f0'
+            }}
           >
             {weekday}
           </div>
@@ -103,20 +141,44 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* Calendar Grid */}
-      <div className="calendar-grid grid grid-cols-7 gap-0">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0'
+      }}>
         {days.map((calendarDay, index) => 
           renderDay(calendarDay, index)
         )}
       </div>
 
       {/* Monthly Memo Section */}
-      <div id="monthly-memo" className="border-t border-slate-200 bg-slate-50 p-4 md:p-6">
-        <h3 className="text-xl font-bold text-slate-800 mb-4">월간 메모</h3>
-        <div className="bg-white rounded-xl p-4 min-h-[5rem]">
+      <div style={{
+        borderTop: '1px solid #e2e8f0',
+        backgroundColor: '#f8fafc',
+        padding: '24px',
+        borderRadius: '0 0 12px 12px'
+      }}>
+        <h3 style={{
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: '#1f2937',
+          marginBottom: '16px',
+          margin: '0 0 16px 0'
+        }}>
+          월간 메모
+        </h3>
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          padding: '16px',
+          minHeight: '80px'
+        }}>
           {commonEvents ? (
             <div 
-              className="whitespace-pre-wrap leading-relaxed"
-              style={{ 
+              style={{
+                whiteSpace: 'pre-wrap',
+                lineHeight: '1.6',
                 fontSize: textSettings.memoFontSize,
                 color: textSettings.memoTextColor
               }}
@@ -124,7 +186,12 @@ const Calendar: React.FC = () => {
               {commonEvents}
             </div>
           ) : (
-            <div className="text-slate-400 italic text-center py-4 text-base">
+            <div style={{
+              color: '#9ca3af',
+              fontStyle: 'italic',
+              textAlign: 'center',
+              padding: '16px 0'
+            }}>
               월간 메모가 없습니다.
             </div>
           )}
